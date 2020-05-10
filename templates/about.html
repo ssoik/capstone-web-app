@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Pharmaceutical drug similarity app.">
+    <meta name="author" content="@ssoik">
+    <!-- <link rel="icon" href="favicon.ico"> -->
+
+    <title>About my TDI Capstone Project</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdn.bokeh.org/bokeh/release/bokeh-0.10.0.min.css" type="text/css" />
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.1.min.js" crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 text-left">
+          <h2>Similar Drug Finder - About</h2>
+            <p>Search for approved and experimental drugs by target drug or category and find other chemically similar drugs. Data courtesy of <a href="https://www.drugbank.ca/" target="_blank">DrugBank</a>.</p>
+            <a href="/search" class="btn btn-default" role="button">Back to Search</a>
+          <h2>Author: Samuel Soik</h2>
+            <ul>
+              <li>samuel.soik@mg.thedataincubator.com</li>
+              <li><a href="https://github.com/ssoik/capstone-web-app" target="_blank">github.com/ssoik/capstone-web-app</a></li>
+            </ul>
+          <h3>Drug Repurposing</h3>
+            <ul>
+              <li>Find new use for existing drug</li>
+              <li>Reduce costs</li>
+            </ul>
+          <h3>Drug Development</h3>
+            <ul>
+              <li>> 10 years</li>
+              <li>> $2B US</li>
+            </ul>
+          <h3>Data</h3>
+            <ul>
+              <li>Full database (1.44 GB)</li>
+              <li>Structure database (3.9 MB)</li>
+              <li>Generated Similarity Index database (2.97 GB)</li>
+            </ul>
+          <h3>How does it work?</h3>
+            <h4>For a target drug <i>t</i>:</h4>
+              <ol>
+                <li>Find <a ref="https://www.rdkit.org/UGM/2012/Landrum_RDKit_UGM.Fingerprints.Final.pptx.pdf" target="_blank">Morgan fingerprints</a> of <i>t</i> and other drugs in the database {<i>t&prime;</i>}</li>
+                <li>Compare fingerprints to compute similarity indices {<i>S<sub>tt&prime;</sub></i>}</li>
+                  <ul>
+                    <li>0 &le; <i>S<sub>tt&prime;</sub></i> &le; 1</li>
+                    <li><i>S<sub>tt&prime;</sub></i> = 0 indicates no structural similarity</li>
+                    <li><i>S<sub>tt&prime;</sub></i> = 1 indicates identical structures</li>
+                  </ul>
+                <li>Choose a similarity threshold <i>S</i><sub>min</sub></li>
+                <li>Select drugs with <i>S<sub>tt&prime;</sub></i> > <i>S</i><sub>min</sub></li>
+              </ol>
+            <h4>For a category of drugs:</h4>
+              <ol>
+                <li>Select approved drugs in the target category</li>
+                <li>Repeat the above for each approved drug</li>
+              </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </body>
+</html>
