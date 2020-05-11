@@ -7,7 +7,7 @@
     <meta name="author" content="@ssoik">
     <!-- <link rel="icon" href="favicon.ico"> -->
 
-    <title>About my TDI Capstone Project</title>
+    <title>About My TDI Capstone Project</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -56,11 +56,22 @@
                 <li>Choose a similarity threshold <i>S</i><sub>min</sub></li>
                 <li>Select drugs with <i>S<sub>tt&prime;</sub></i> > <i>S</i><sub>min</sub></li>
               </ol>
+            {{ target_script|safe }}
+            <div class="bokeh">
+            {{ target_div|safe }}
+            </div>
             <h4>For a category of drugs:</h4>
               <ol>
                 <li>Select approved drugs in the target category</li>
-                <li>Repeat the above for each approved drug</li>
+                <li>Set similarity threshold by clustering approved drugs</li>
+                <li>Perform the target drug algorithm for each approved drug</li>
               </ol>
+            {{ category_script|safe }}
+            <div class="bokeh">
+            {{ category_div|safe }}
+            </div>
+            <br/>
+            <br/>
           </div>
         </div>
       </div>

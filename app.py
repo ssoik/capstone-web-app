@@ -13,27 +13,37 @@ def search():
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+
+    # Get components to plot stats
+    target_stats = open('target_stats.txt', 'r')
+    target_comps = target_stats.read().split(';;;;;')
+    category_stats = open('category_stats.txt', 'r')
+    category_comps = category_stats.read().split(';;;;;')
+    return render_template('about.html', target_script=target_comps[0], target_div=target_comps[1], \
+        category_script=category_comps[0], category_div=category_comps[1])
 
 @app.route('/display_target', methods = ['POST'])
 def display_target():
-
+    
     # Request target and check if script, div exist
     target = request.form['target']
+    sim_thresh = float(request.form['threshold'])
     fname = f"{'-'.join(target.split(' '))}.txt"
+    """
     if os.path.exists(f'target-plots-cache/{fname}'):
         text = open(f'target-plots-cache/{fname}', 'r')
         text_parts = text.read().split(';;;;;')
         return render_template('display_target.html', script=text_parts[0], div=text_parts[1])
-
+    """
     # Load data
+    inds = pd.read_csv(f'{filepath}sim-data/{fname}')
     full_data = pd.read_csv(f'{filepath}full_database.csv')
+    joined_data = pd.merge(inds, full_data, on='drugbank-id')
 
     # Select approved and experimental drugs
-    sim_thresh = 0.7
-    approved_drugs = find.similar_approved([target], [], sim_thresh, full_data, filepath)
+    approved_drugs = find.similar_approved([target], [], sim_thresh, joined_data, filepath)
     experimental_drugs = find.similar_experimental(pd.concat([pd.Series(target), approved_drugs]), [], \
-        sim_thresh, full_data, filepath)
+        sim_thresh, joined_data, filepath)
 
     # Construct graph
     full_ids = pd.Series(pd.concat([pd.Series(target), approved_drugs, experimental_drugs]), name='drugbank-id')
@@ -45,7 +55,7 @@ def display_target():
         bounds.append(len(df) + bounds[-1])
 
     # Render HTML template and cache
-    script, div = plot.plot_target(sim_matrix, full_ids, bounds, full_data, target, sim_thresh)
+    script, div = plot.plot_target(sim_matrix, full_ids, bounds, joined_data, target, sim_thresh)
     cache = open(f'target-plots-cache/{fname}', 'w')
     cache.write(f'{script};;;;;{div}')
     cache.close()
@@ -57,6 +67,7 @@ def display_category():
     # Request category and check if script, div exist
     category = request.form['category']
     fname = f"{'-'.join(category.split(' '))}.txt"
+
     if os.path.exists(f'category-plots-cache/{fname}'):
         text = open(f'category-plots-cache/{fname}', 'r')
         text_parts = text.read().split(';;;;;')

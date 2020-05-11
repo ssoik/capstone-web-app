@@ -7,7 +7,7 @@
     <meta name="author" content="@ssoik">
     <!-- <link rel="icon" href="favicon.ico"> -->
 
-    <title>Welcome to my TDI Capstone Project!</title>
+    <title>Welcome to My TDI Capstone Project!</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -23,7 +23,7 @@
           <br/>
           <br/>
           <form id="selecttarget" method="post" action="display_target">
-            <p>Search by target drug:</p>
+            <h3>Search by target drug:</h3>
             <select class="selectpicker" data-live-search="true" name="target">
               <option value="DB02510">'5'-O-(N-(L-Prolyl)-Sulfamoyl)Adenosine</option>
               <option value="DB04280">((2r,3s,5r)-3-Hydroxy-5-(4-Hydroxy-2-Oxo-3,4-Dihydropyrimidin-1(2h)-Yl)-Tetrahydrofuran-2-Yl)Methyldihydrogen Phosphate</option>
@@ -10696,13 +10696,27 @@
             </select>
             <br/>
             <br/>
+            <p>Similarity threshold:</p>
+            <select class="selectpicker" name="threshold">
+              <option value="0.50">0.50</option>
+              <option value="0.55">0.55</option>
+              <option value="0.60">0.60</option>
+              <option value="0.65">0.65</option>
+              <option value="0.70" selected>0.70</option>
+              <option value="0.75">0.75</option>
+              <option value="0.80">0.80</option>
+              <option value="0.85">0.85</option>
+              <option value="0.90">0.90</option>
+            </select>
+            <br/>
+            <br/>
             <p>
             <input type="submit" value="Submit"/>
             </p>
           <br/>
           </form>
           <form id="selectcategory" method="post" action="display_category">
-            <p>Search by category:</p>
+            <h3>Search by category:</h3>
             <select class="selectpicker" data-live-search="true" name="category">
               <option value="1-Naphthylamine">1-Naphthylamine</option>
               <option value="11-Hydroxycorticosteroids">11-Hydroxycorticosteroids</option>

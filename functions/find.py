@@ -3,11 +3,11 @@
 import pandas as pd
 
 def approved(category, joined_data):
-    return joined_data[joined_data['categories'].str.contains(category, na=False) & \
+    return joined_data[joined_data['categories'].str.contains(category, na=False, regex=False) & \
                        joined_data['groups'].str.contains('approved', na=False)]
 
 def experimental(category, joined_data):
-    return joined_data[joined_data['categories'].str.contains(category, na=False) & \
+    return joined_data[joined_data['categories'].str.contains(category, na=False, regex=False) & \
                        ~joined_data['groups'].str.contains('approved', na=True)]
 
 def similar_approved(approved_ids, experimental_ids, sim_threshold, joined_data, filepath):
@@ -16,7 +16,7 @@ def similar_approved(approved_ids, experimental_ids, sim_threshold, joined_data,
         inds = pd.read_csv(f'{filepath}sim-data/{drug}.txt')
         other_approved_ids += [db_id for db_id in pd.merge(inds['drugbank-id'][inds['dice-similarity'] > \
                                 sim_threshold], \
-                                joined_data[joined_data['groups'].str.contains('approved', na=False)], \
+                                joined_data[joined_data['groups'].str.contains('approved', na=False, regex=False)], \
                                 on='drugbank-id')['drugbank-id'] if \
                                 db_id not in (list(approved_ids) + list(experimental_ids))]
 
@@ -28,7 +28,7 @@ def similar_experimental(approved_ids, experimental_ids, sim_threshold, joined_d
         inds = pd.read_csv(f'{filepath}sim-data/{drug}.txt')
         other_experimental_ids += [db_id for db_id in pd.merge(inds['drugbank-id'][inds['dice-similarity'] > \
                                     sim_threshold], \
-                                    joined_data[~joined_data['groups'].str.contains('approved', na=True)], \
+                                    joined_data[~joined_data['groups'].str.contains('approved', na=True, regex=False)], \
                                     on='drugbank-id')['drugbank-id'] if \
                                     db_id not in (list(approved_ids) + list(experimental_ids))]
 
