@@ -1,4 +1,6 @@
+python==3.7.4
 gunicorn==19.9.0
+flask==1.1.1
 requests==2.20.0
 pandas==1.0.3
 numpy==1.18.1
