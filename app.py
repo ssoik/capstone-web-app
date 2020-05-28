@@ -41,12 +41,19 @@ def display_target():
     joined_data = pd.merge(inds, full_data, on='drugbank-id')
 
     # Select approved and experimental drugs
-    approved_drugs = find.similar_approved([target], [], sim_thresh, joined_data, filepath)
-    experimental_drugs = find.similar_experimental([target], [], sim_thresh, joined_data, filepath)
+    approved_drugs = find.similar_approved([target], [], sim_thresh, joined_data, url)
+    experimental_drugs = find.similar_experimental([target], [], sim_thresh, joined_data, url)
 
     # Construct graph
     full_ids = pd.Series(pd.concat([pd.Series(target), approved_drugs, experimental_drugs]), name='drugbank-id')
-    sim_matrix = matrix.similarity_matrix(full_ids, filepath)
+    ### DEBUG ###
+    for drug in full_ids:
+        try:
+            pd.read_csv(f'{url}sim-data/{drug}.txt')
+        except:
+            return drug
+    ### DEBUG ###
+    sim_matrix = matrix.similarity_matrix(full_ids, url)
 
     # Determine boundaries by status
     bounds = [0, 1]
@@ -84,19 +91,19 @@ def display_category():
     experimental_drugs = find.experimental(category, joined_data)
 
     # Set similarity threshold
-    approved_sim_matrix = matrix.similarity_matrix(approved_drugs['drugbank-id'], filepath)
-    sim_thresh = matrix.similarity_threshold(approved_sim_matrix, approved_drugs['drugbank-id'], filepath)
+    approved_sim_matrix = matrix.similarity_matrix(approved_drugs['drugbank-id'], url)
+    sim_thresh = matrix.similarity_threshold(approved_sim_matrix, approved_drugs['drugbank-id'], url)
 
     # Find similar drugs
     sim_approved_drug_ids = find.similar_approved(approved_drugs['drugbank-id'], \
-        experimental_drugs['drugbank-id'], sim_thresh, joined_data, filepath)
+        experimental_drugs['drugbank-id'], sim_thresh, joined_data, url)
     sim_experimental_drug_ids = find.similar_experimental(approved_drugs['drugbank-id'], \
-        experimental_drugs['drugbank-id'], sim_thresh, joined_data, filepath)
+        experimental_drugs['drugbank-id'], sim_thresh, joined_data, url)
 
     # Construct full graph
     full_ids = pd.Series(pd.concat([approved_drugs['drugbank-id'], experimental_drugs['drugbank-id'], \
         sim_approved_drug_ids, sim_experimental_drug_ids]), name='drugbank-id')
-    full_sim_matrix = matrix.similarity_matrix(full_ids, filepath)
+    full_sim_matrix = matrix.similarity_matrix(full_ids, url)
 
     # Determine boundaries by status
     bounds = [0]
@@ -113,4 +120,4 @@ def display_category():
     return render_template('display_category.html', script=script, div=div)
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(port=5000, debug=True)

@@ -13,7 +13,6 @@ def plot_target(matrix, full_ids, boundaries, data, target, sim_threshold):
     # Flatten matrix
     flatten = MDS(n_components=2)
     flatten_matrix = flatten.fit_transform(matrix)
-    scaled_coords = flatten_matrix / np.sqrt(2) / (1 - sim_threshold)
 
     # Make df for Bokeh
     merged_data = pd.merge(full_ids, data, on='drugbank-id')
