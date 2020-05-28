@@ -46,13 +46,6 @@ def display_target():
 
     # Construct graph
     full_ids = pd.Series(pd.concat([pd.Series(target), approved_drugs, experimental_drugs]), name='drugbank-id')
-    ### DEBUG ###
-    for drug in full_ids:
-        try:
-            pd.read_csv(f'{url}sim-data/{drug}.txt')
-        except:
-            return drug
-    ### DEBUG ###
     sim_matrix = matrix.similarity_matrix(full_ids, url)
 
     # Determine boundaries by status
