@@ -7,7 +7,7 @@ url = 'https://tdi-capstone-web-app-data.s3.us-east-2.amazonaws.com/'
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/search')
 def search():
     return render_template('search.html')
 
