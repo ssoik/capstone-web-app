@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from functions import find, matrix, plot
 
-filepath = '~/Documents/TDI/capstone-project/data/'
+url = 'https://tdi-capstone-web-app-data.s3.us-east-2.amazonaws.com/'
 
 app = Flask(__name__)
 
@@ -28,7 +28,7 @@ def display_target():
     # Request target and check if script, div exist
     target = request.form['target']
     sim_thresh = float(request.form['threshold'])
-    fname = f"{'-'.join(target.split(' '))}.txt"
+    fname = f'{target}.txt'
     """
     if os.path.exists(f'target-plots-cache/{fname}'):
         text = open(f'target-plots-cache/{fname}', 'r')
@@ -36,14 +36,13 @@ def display_target():
         return render_template('display_target.html', script=text_parts[0], div=text_parts[1])
     """
     # Load data
-    inds = pd.read_csv(f'{filepath}sim-data/{fname}')
-    full_data = pd.read_csv(f'{filepath}full_database.csv')
+    inds = pd.read_csv(f'{url}sim-data/{fname}')
+    full_data = pd.read_csv(f'{url}drugbank-data/full_database.csv')
     joined_data = pd.merge(inds, full_data, on='drugbank-id')
 
     # Select approved and experimental drugs
     approved_drugs = find.similar_approved([target], [], sim_thresh, joined_data, filepath)
-    experimental_drugs = find.similar_experimental(pd.concat([pd.Series(target), approved_drugs]), [], \
-        sim_thresh, joined_data, filepath)
+    experimental_drugs = find.similar_experimental([target], [], sim_thresh, joined_data, filepath)
 
     # Construct graph
     full_ids = pd.Series(pd.concat([pd.Series(target), approved_drugs, experimental_drugs]), name='drugbank-id')
@@ -56,9 +55,11 @@ def display_target():
 
     # Render HTML template and cache
     script, div = plot.plot_target(sim_matrix, full_ids, bounds, joined_data, target, sim_thresh)
+    """
     cache = open(f'target-plots-cache/{fname}', 'w')
     cache.write(f'{script};;;;;{div}')
     cache.close()
+    """
     return render_template('display_target.html', script=script, div=div)
 
 @app.route('/display_category', methods = ['POST'])
@@ -67,15 +68,15 @@ def display_category():
     # Request category and check if script, div exist
     category = request.form['category']
     fname = f"{'-'.join(category.split(' '))}.txt"
-
+    """
     if os.path.exists(f'category-plots-cache/{fname}'):
         text = open(f'category-plots-cache/{fname}', 'r')
         text_parts = text.read().split(';;;;;')
         return render_template('display_category.html', script=text_parts[0], div=text_parts[1])
-
+    """
     # Load data
-    full_data = pd.read_csv(f'{filepath}full_database.csv')
-    struct_data = pd.read_csv(f'{filepath}structure_links_clean.csv')
+    full_data = pd.read_csv(f'{url}drugbank-data/full_database.csv')
+    struct_data = pd.read_csv(f'{url}drugbank-data/structure_links_clean.csv')
     joined_data = pd.merge(full_data, struct_data, left_on='drugbank-id', right_on='DrugBank ID')
 
     # Select approved and experimental drugs
@@ -104,9 +105,11 @@ def display_category():
 
     # Render HTML template and cache
     script, div = plot.plot_category(full_sim_matrix, full_ids, bounds, joined_data, category, sim_thresh)
+    """
     cache = open(f'category-plots-cache/{fname}', 'w')
     cache.write(f'{script};;;;;{div}')
     cache.close()
+    """
     return render_template('display_category.html', script=script, div=div)
 
 if __name__ == '__main__':

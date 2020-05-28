@@ -13,6 +13,7 @@ def plot_target(matrix, full_ids, boundaries, data, target, sim_threshold):
     # Flatten matrix
     flatten = MDS(n_components=2)
     flatten_matrix = flatten.fit_transform(matrix)
+    scaled_coords = flatten_matrix / np.sqrt(2) / (1 - sim_threshold)
 
     # Make df for Bokeh
     merged_data = pd.merge(full_ids, data, on='drugbank-id')
@@ -30,14 +31,12 @@ def plot_target(matrix, full_ids, boundaries, data, target, sim_threshold):
         toolbar_location='below')
     p.axis.visible = False
     p.grid.visible = False
-    colors = ['black', 'green', 'red']
+    colors = ['blue', 'green', 'red']
     labels = ['Target drug', 'Similar approved', 'Similar experimental']
     legend_items = []
-    for i, (stop1, stop2) in enumerate(zip(boundaries[:-1], boundaries[1:])):
-        c = p.circle('x', 'y', color=colors[i], size=16, source=source[stop1:stop2])
-        legend_items.append((f"{labels[i]} ({stop2 - stop1})", [c]))
-        if i == 0:
-            c.level = 'overlay'
+    for i, (stop1, stop2) in enumerate(zip(boundaries[:-1][::-1], boundaries[1:][::-1])):
+        c = p.circle('x', 'y', color=colors[::-1][i], size=16, source=source[stop1:stop2])
+        legend_items = [(f"{labels[::-1][i]} ({stop2 - stop1})", [c])] + legend_items
 
     p.add_tools(HoverTool(
         tooltips=[
@@ -78,9 +77,9 @@ def plot_category(matrix, full_ids, boundaries, joined_data, category, sim_thres
     colors = ['blue', 'orange', 'green', 'red']
     labels = ['Approved', 'Experimental', 'Similar approved', 'Similar experimental']
     legend_items = []
-    for i, (stop1, stop2) in enumerate(zip(boundaries[:-1], boundaries[1:])):
-        c = p.circle('x', 'y', color=colors[i], size=16, source=source[stop1:stop2])
-        legend_items.append((f'{labels[i]} ({stop2 - stop1})', [c]))
+    for i, (stop1, stop2) in enumerate(zip(boundaries[:-1][::-1], boundaries[1:][::-1])):
+        c = p.circle('x', 'y', color=colors[::-1][i], size=16, source=source[stop1:stop2])
+        legend_items = [(f'{labels[::-1][i]} ({stop2 - stop1})', [c])] + legend_items
 
     p.add_tools(HoverTool(
         tooltips=[
