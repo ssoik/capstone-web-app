@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="//cdn.bokeh.org/bokeh/release/bokeh-0.10.0.min.css" type="text/css" />
     <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   </head>
   <body>
@@ -22,50 +24,67 @@
           <h2>Similar Drug Finder - About</h2>
             <p>Search for approved and experimental drugs by target drug or category and find other chemically similar drugs. Data courtesy of <a href="https://www.drugbank.ca/" target="_blank">DrugBank</a>.</p>
             <a href="/" class="btn btn-default" role="button">Back to Search</a>
-          <h2>Author: Samuel Soik</h2>
-            <ul>
-              <li>samuel.soik@mg.thedataincubator.com</li>
-              <li><a href="https://github.com/ssoik/capstone-web-app" target="_blank">github.com/ssoik/capstone-web-app</a></li>
-            </ul>
+          <h2>About the Author - Samuel Soik</h2>
+            <p>
+            I am an alumnus of the University of Pennsylvania, where I concurrently received my Bachelor’s and Master’s Degrees in Physics. My research has explored various topics, ranging from DNA vaccine testing to computational polymer physics. As a Fellow in The Data Incubator’s Spring 2020 San Francisco cohort, I designed this interactive web application to help inform drug repurposing, building upon my experience in early-stage drug development and scientific computing. I am very excited to bring my passion for learning and desire to wear multiple hats to the workplace in my next role as a Data Scientist.
+            <br/>
+            <br/>
+            The GitHub repository for this project can be found <a href="https://github.com/ssoik/capstone-web-app" target="_blank">here</a>. For further comments and inquiries, please contact me at samuel.soik@mg.thedataincubator.com or connect with me on <a href="https://www.linkedin.com/in/samuel-soik-87377092/" target="_blank">LinkedIn</a>.
+            </p>
           <h3>Drug Repurposing</h3>
-            <ul>
-              <li>Find new use for existing drug</li>
-              <li>Reduce costs</li>
-            </ul>
-          <h3>Drug Development</h3>
-            <ul>
-              <li>> 10 years</li>
-              <li>> $2B US</li>
-            </ul>
+            <p>
+              Drug repurposing (also called drug repositioning) aims to find new uses for existing pharmaceutical drugs. It is often an attractive alternative to the traditional drug development process; on average, developing a new drug requires more than <a href="https://pubmed.ncbi.nlm.nih.gov/20130567/" target="_blank">12 years of research</a> and costs <a href="https://pubmed.ncbi.nlm.nih.gov/26928437/" target="_blank">$2.6 billion</a>. My data-driven approach will allow drug researchers to predict the best candidates for repurposing studies by comparing chemical structures. This has far-reaching implications for the pharmaceutical and healthcare industries in reducing costs of R&D, and, ultimately, reducing patients’ out-of-pocket expenses.
+            </p>
           <h3>Data</h3>
-            <ul>
-              <li>Full database (1.44 GB)</li>
-              <li>Structure database (3.9 MB)</li>
-              <li>Generated Similarity Index database (2.97 GB)</li>
-            </ul>
+            <p>
+              For this analysis, I have merged the <a href="https://www.drugbank.ca/releases/latest" target="_blank">DrugBank complete database</a> (1.44 GB uncompressed) with the <a href="https://www.drugbank.ca/releases/latest#structures" target="_blank">DrugBank structures database</a> (3.9 MB) to generate a similarity index database (2.97 GB).
+            </p>
           <h3>How does it work?</h3>
-            <h4>For a target drug <i>t</i>:</h4>
+            <p>
+              Fundamentally, the algorithm uses <a href="https://www.rdkit.org/" target="_blank">RDKit</a> to compare the chemical structures of drugs in order to select those with the highest degree of similarity. These are the top candidates for repurposing studies.
+            </p>
+            <h4>Starting with a target drug \(t\):</h4>
               <ol>
-                <li>Find <a ref="https://www.rdkit.org/UGM/2012/Landrum_RDKit_UGM.Fingerprints.Final.pptx.pdf" target="_blank">Morgan fingerprints</a> of <i>t</i> and other drugs in the database {<i>t&prime;</i>}</li>
-                <li>Compare fingerprints to compute similarity indices {<i>S<sub>tt&prime;</sub></i>}</li>
-                  <ul>
-                    <li>0 &le; <i>S<sub>tt&prime;</sub></i> &le; 1</li>
-                    <li><i>S<sub>tt&prime;</sub></i> = 0 indicates no structural similarity</li>
-                    <li><i>S<sub>tt&prime;</sub></i> = 1 indicates identical structures</li>
-                  </ul>
-                <li>Choose a similarity threshold <i>S</i><sub>min</sub></li>
-                <li>Select drugs with <i>S<sub>tt&prime;</sub></i> > <i>S</i><sub>min</sub></li>
+                <li>
+                  Find the <a href="https://www.rdkit.org/UGM/2012/Landrum_RDKit_UGM.Fingerprints.Final.pptx.pdf" target="_blank">Morgan fingerprints</a> of \(t\) and other drugs in the database \(\{t’\}\). These are structural signatures of the molecule, such as connectivity, and chemical features like electron donation/acceptance, aromaticity, halogenicity, and basicity/acidity.
+                </li>
+                <li>
+                  Compare fingerprints to compute the <a href="https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient" target="_blank">S&#248;rensen-Dice similarity indices</a> \(\{S_{tt’}\}\). For two sets of fingerprints, \(T\) and \(T’\), this value is given by
+\[S_{tt’} \equiv S(T, T’) = {2 | T \cap T’ | \over | T | + | T’ |},\]
+where \(T \cap T'\) is the intersection (i.e., set of common elements) of \(T\) and \(T'\), and \(| T |\) and \(| T’ |\) are the cardinalities (i.e., number of elements) of each set. As such, \(0 \leq S_{tt’} \leq 1\), where \(S_{tt’} = 0\) indicates no common fingerprints (highly dissimilar structures), and \(S_{tt’} = 1\) indicates identical sets of fingerprints (highly similar structures).
+                </li>
+                <li>
+                  Choose a similarity threshold \(S_{\mathrm{min}}\) and select drugs with \(S_{tt’} > S_{\mathrm{min}}\).
+                </li>
               </ol>
+            <a href="/" class="btn btn-default" role="button">Try it out!</a>
+            <br/>
+            <br/>
+            <p>
+              Below is a plot of the mean number of similar drugs found vs. similarity threshold for a random sample of 1000 drugs. While the model finds about 100 drugs at \(S_{\mathrm{min}} = 0.5\), it selects only about six at \(S_{\mathrm{min}} = 0.7\), providing a reasonable number of candidates for repurposing studies. This method allows the user to find other drugs similar to one target drug, suggesting the uses for the similar drugs could be applied to the target drug, or, vice versa, the target drug’s uses could be applied to the similar drugs.
+            </p>
             {{ target_script|safe }}
             <div class="bokeh">
             {{ target_div|safe }}
             </div>
             <h4>For a category of drugs:</h4>
               <ol>
-                <li>Select approved drugs in the target category</li>
-                <li>Set similarity threshold by clustering approved drugs</li>
-                <li>Perform the target drug algorithm for each approved drug</li>
+                <li>
+                  Select approved drugs in the target category.
+                </li>
+                <li>
+                  The optimal similarity threshold is set by <a href="https://en.wikipedia.org/wiki/Affinity_propagation" target="_blank">clustering</a> the approved drugs and comparing similarity indices within clusters.
+                </li>
+                <li>
+                  Perform the above target drug algorithm for each approved drug.
+                </li>
               </ol>
+            <a href="/" class="btn btn-default" role="button">Try it out!</a>
+            <br/>
+            <br/>
+            <p>
+              Below is a histogram of the number of similar drugs found for each of a random sample of 1000 drugs. While the number of drugs can extend into the thousands for some categories, the model finds a smaller, more specific set for most. Still, the large number of potentially repurposable drugs the model finds demonstrates the power it can provide to helping drug researchers deliver faster and cheaper results.
+            </p>
             {{ category_script|safe }}
             <div class="bokeh">
             {{ category_div|safe }}
