@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect
-import os
+import requests
+import re
 import pandas as pd
 from functions import find, matrix, plot
 
@@ -25,16 +26,11 @@ def about():
 @app.route('/display_target', methods = ['POST'])
 def display_target():
     
-    # Request target and check if script, div exist
+    # Request target
     target = request.form['target']
     sim_thresh = float(request.form['threshold'])
     fname = f'{target}.txt'
-    """
-    if os.path.exists(f'target-plots-cache/{fname}'):
-        text = open(f'target-plots-cache/{fname}', 'r')
-        text_parts = text.read().split(';;;;;')
-        return render_template('display_target.html', script=text_parts[0], div=text_parts[1])
-    """
+    
     # Load data
     inds = pd.read_csv(f'{url}sim-data/{fname}')
     full_data = pd.read_csv(f'{url}drugbank-data/full_database.csv')
@@ -53,27 +49,24 @@ def display_target():
     for df in [approved_drugs, experimental_drugs]:
         bounds.append(len(df) + bounds[-1])
 
-    # Render HTML template and cache
+    # Render HTML template
     script, div = plot.plot_target(sim_matrix, full_ids, bounds, joined_data, target, sim_thresh)
-    """
-    cache = open(f'target-plots-cache/{fname}', 'w')
-    cache.write(f'{script};;;;;{div}')
-    cache.close()
-    """
     return render_template('display_target.html', script=script, div=div)
 
 @app.route('/display_category', methods = ['POST'])
 def display_category():
 
-    # Request category and check if script, div exist
+    # Request category
     category = request.form['category']
-    fname = f"{'-'.join(category.split(' '))}.txt"
-    """
-    if os.path.exists(f'category-plots-cache/{fname}'):
-        text = open(f'category-plots-cache/{fname}', 'r')
-        text_parts = text.read().split(';;;;;')
-        return render_template('display_category.html', script=text_parts[0], div=text_parts[1])
-    """
+    fname = f"{'-'.join(re.split(' |/', category))}"
+
+    # Get components from cache and render HTML template
+    components = requests.get(f'{url}category-cache/{fname}.txt', 'r').text.split(';;;;;')
+    return render_template('display_category.html', script=components[0], div=components[1])
+
+
+    """The original code for these computations follows. Visual components were then cached to improve app performance.
+    
     # Load data
     full_data = pd.read_csv(f'{url}drugbank-data/full_database.csv')
     struct_data = pd.read_csv(f'{url}drugbank-data/structure_links_clean.csv')
@@ -103,14 +96,11 @@ def display_category():
     for df in [approved_drugs, experimental_drugs, sim_approved_drug_ids, sim_experimental_drug_ids]:
         bounds.append(len(df) + bounds[-1])
 
-    # Render HTML template and cache
+    # Get plot components and render HTML
     script, div = plot.plot_category(full_sim_matrix, full_ids, bounds, joined_data, category, sim_thresh)
-    """
-    cache = open(f'category-plots-cache/{fname}', 'w')
-    cache.write(f'{script};;;;;{div}')
-    cache.close()
-    """
     return render_template('display_category.html', script=script, div=div)
+    """
+
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
